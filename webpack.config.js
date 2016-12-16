@@ -16,7 +16,9 @@ var plugins = [
         NODE_ENV: JSON.stringify(process.env.NODE_ENV || 'development')
       }
     }),
-    new ExtractTextPlugin(cssName)
+    new ExtractTextPlugin(cssName),
+    new webpack.HotModuleReplacementPlugin(),
+    new webpack.NoErrorsPlugin()
 ];
 
 if (process.env.NODE_ENV === 'production') {
@@ -32,7 +34,11 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 module.exports = {
-  entry: ['babel-polyfill', './src/client.js'],
+  entry: [
+    'webpack/hot/only-dev-server',
+    'react-hot-loader/patch',
+    'babel-polyfill',
+    './src/client.js'],
   debug: process.env.NODE_ENV !== 'production',
   resolve: {
     root: path.join(__dirname, 'src'),
@@ -61,11 +67,11 @@ module.exports = {
       { test: /\.png$/, loader: 'url-loader?limit=10000&mimetype=image/png' },
       { test: /\.svg/, loader: 'url-loader?limit=10000&mimetype=image/svg+xml' },
       { test: /\.(woff|woff2|ttf|eot)/, loader: 'url-loader?limit=1' },
-      { test: /\.jsx?$/, loader: 'babel!eslint-loader', exclude: [/node_modules/, /public/] },
+      { test: /\.jsx?$/, loader: process.env.NODE_ENV !== 'production' ? 'babel!eslint-loader' : 'babel', exclude: [/node_modules/, /public/] },
       { test: /\.json$/, loader: 'json-loader' }
     ]
   },
-  devtool: process.env.NODE_ENV !== 'production' ? 'source-map' : null,
+  devtool: process.env.NODE_ENV !== 'production' ? 'eval-source-map' : null,
   devServer: {
     headers: { 'Access-Control-Allow-Origin': '*' }
   }
