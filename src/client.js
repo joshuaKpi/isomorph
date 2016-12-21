@@ -14,7 +14,7 @@ ReactDOM.render(
 // Hot Module Replacement API
 if (module.hot) {
   module.hot.accept('./components/App', () => {
-    const NextApp = require('./components/App').default;
+    const NextApp = require('./components/App').default; // eslint-disable-line newline-after-var
     ReactDOM.render(
       <AppContainer>
         <NextApp />
