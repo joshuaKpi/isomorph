@@ -5,7 +5,8 @@ import Button from 'react-bootstrap/lib/Button';
 const styles = {
   counterLabel: {
     display: 'inline-block',
-    marginRight: '20px'
+    marginRight: '20px',
+    fontSize: '20px'
   }
 };
 
