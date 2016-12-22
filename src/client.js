@@ -2,11 +2,18 @@ import 'babel-polyfill';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { AppContainer } from 'react-hot-loader';
-import App from 'components/App';
+import { browserHistory, Router } from 'react-router';
+import routes from './routes';
+
+const component = (
+  <Router history={browserHistory}>
+    {routes}
+  </Router>
+);
 
 ReactDOM.render(
   <AppContainer>
-    <App />
+    {component}
   </AppContainer>,
   document.getElementById('react-view')
 );
