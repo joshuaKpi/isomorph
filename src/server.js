@@ -5,13 +5,30 @@ import { match, RouterContext } from 'react-router';
 import routes from './routes';
 import { Provider } from 'react-redux';
 import configureStore from './redux/configureStore';
+import cookieParser from 'cookie-parser';
+import { getHeaders, initialize } from 'redux-oauth';
+import { timeRequest } from 'redux/actions/timeActions';
 
 const app = express();
+
+app.use(cookieParser());
 
 app.use((req, res) => {
   const store = configureStore();
 
-  match({ routes, location: req.url }, (error, redirectLocation, renderProps) => {
+  return store.dispatch(initialize({
+    backend: {
+      apiUrl: 'https://redux-oauth-backend.herokuapp.com',
+      authProviderPaths: {
+        github: '/auth/github'
+      },
+      signOutPath: null
+    },
+    cookies: req.cookies,
+    currentLocation: req.url
+  }))
+    .then(() => store.dispatch(timeRequest()))
+    .then(() => match({ routes: routes(store), location: req.url }, (error, redirectLocation, renderProps) => {
     if (redirectLocation) {
       return res.redirect(301, redirectLocation.pathname + redirectLocation.search);
     }
@@ -31,13 +48,21 @@ app.use((req, res) => {
         </Provider>
     );
 
-    res.end(renderHTML(componentHTML));
-  });
+    const state = store.getState();
+
+    res.cookie(
+        'authHeaders',
+        JSON.stringify(getHeaders(store.getState())),
+        { maxAge: Date.now() + 14 * 24 * 3600 * 1000 }
+    );
+
+    return res.end(renderHTML(componentHTML, state));
+  })).catch(() => console.log('hernya v server.js'));
 });
 
 const assetUrl = process.env.NODE_ENV !== 'production' ? 'http://localhost:2012' : '/';
 
-function renderHTML(componentHTML) {
+function renderHTML(componentHTML, inititalState) {
   return `
     <!DOCTYPE html>
       <html>
@@ -46,6 +71,9 @@ function renderHTML(componentHTML) {
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>Hello React</title>
           <link rel="stylesheet" href="${assetUrl}/public/assets/styles.css">
+          <script type="application/javascript">
+            window.REDUX_INITIAL_STATE = ${JSON.stringify(initialState)};
+          </script>
       </head>
       <body>
         <div id="react-view">${componentHTML}</div>

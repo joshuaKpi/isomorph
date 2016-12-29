@@ -1,4 +1,4 @@
-import React, { Components, PropTypes } from 'react';
+import React, { Component, PropTypes } from 'react';
 import AppProd from './App.prod';
 import DevTools from '../DevTools';
 
