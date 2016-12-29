@@ -57,12 +57,13 @@ app.use((req, res) => {
     );
 
     return res.end(renderHTML(componentHTML, state));
-  })).catch(() => console.log('hernya v server.js'));
+  }))
+    .catch((err) => console.log('hernya v server.js' + err));
 });
 
 const assetUrl = process.env.NODE_ENV !== 'production' ? 'http://localhost:2012' : '/';
 
-function renderHTML(componentHTML, inititalState) {
+function renderHTML(componentHTML, initialState) {
   return `
     <!DOCTYPE html>
       <html>
